@@ -6,7 +6,6 @@ import redis from 'redis';
 import conncectRedis from 'connect-redis';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-import { AuthResolver } from './resolvers/AuthResolver';
 import { MovieResolver } from './resolvers/MovieResolver';
 
 const RedisStore = conncectRedis(session);
@@ -36,7 +35,7 @@ const RedisClient = redis.createClient();
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [AuthResolver, MovieResolver],
+            resolvers: [MovieResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res }),

@@ -1,58 +1,34 @@
-import { Resolver, Arg, Mutation, Int, Query, UseMiddleware } from 'type-graphql';
+import { Resolver, Query, Arg, ID } from 'type-graphql';
+import { movieService } from '../services/movieService';
+import { MovieResponse } from './types/MovieResponse';
 
-import { Movie } from '../entity/Movie';
-
-import { MovieOptions, MovieUpdateOptions, DirectorOptions } from '../graphql-types/MovieInput';
-
-import { isAuth } from '../middleware/isAuth';
-
-import { Director } from '../entity/Director';
+const moviesNotFound: MovieResponse = {
+    errors: [
+        {
+            path: 'movies',
+            message: 'NOT_FOUND',
+        },
+    ],
+};
 
 @Resolver()
 export class MovieResolver {
-    @Query(() => [Movie])
-    @UseMiddleware(isAuth)
-    movies(): Promise<Movie[]> {
-        return Movie.find({
-            relations: ['director'],
-        });
-    }
+    @Query(() => MovieResponse)
+    async movies(@Arg('id', _ => ID, { nullable: true }) id?: number): Promise<MovieResponse> {
+        if (!id) {
+            const movies = await movieService.getAll();
+            if (movies.length === 0) {
+                return moviesNotFound;
+            }
+            return { movies };
+        }
 
-    @Mutation(() => Movie)
-    @UseMiddleware(isAuth)
-    async createMovie(
-        @Arg('movie', () => MovieOptions) movieOptions: MovieOptions,
-        @Arg('director', () => DirectorOptions)
-        directorOptions: DirectorOptions,
-    ): Promise<Movie> {
-        const director = await Director.create(directorOptions).save();
-        const movie = Movie.create(movieOptions);
-        movie.director = director;
-        const output = await movie.save();
-        return output;
-    }
+        const movie = await movieService.getById(id!);
 
-    @Mutation(() => Movie)
-    @UseMiddleware(isAuth)
-    async updateMovie(
-        @Arg('id', () => Int) id: number,
-        @Arg('options', () => MovieUpdateOptions) options: MovieUpdateOptions,
-    ): Promise<Boolean> {
-        await Movie.update(
-            {
-                id,
-            },
-            options,
-        );
-        return true;
-    }
+        if (!movie) {
+            return moviesNotFound;
+        }
 
-    @Mutation(() => Boolean)
-    @UseMiddleware(isAuth)
-    async deleteMovie(@Arg('id', () => Int) id: number): Promise<Boolean> {
-        await Movie.delete({
-            id,
-        });
-        return true;
+        return { movies: [movie] };
     }
 }
