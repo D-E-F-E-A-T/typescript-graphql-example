@@ -6,7 +6,7 @@ import redis from 'redis';
 import conncectRedis from 'connect-redis';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-import { MovieResolver } from './resolvers/MovieResolver';
+import { MovieResolver } from './resolvers';
 
 const RedisStore = conncectRedis(session);
 const RedisClient = redis.createClient();

@@ -1,5 +1,5 @@
 import { getConnection, createQueryBuilder } from 'typeorm';
-import { Movie } from '../entity/Movie';
+import { Movie } from '../entities';
 
 class MovieService {
     public getAll(): Promise<Movie[]> {

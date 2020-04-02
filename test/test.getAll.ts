@@ -1,6 +1,6 @@
 import { movieService } from '../src/services';
 
-import { Movie } from '../src/entity/Movie';
+import { Movie } from '../src/entities';
 
 import typeorm = require('typeorm');
 
