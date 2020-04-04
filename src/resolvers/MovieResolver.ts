@@ -1,8 +1,6 @@
 import { Resolver, Query, Arg, ID, Mutation } from 'type-graphql';
-import { movieService } from '../services/movieService';
-import { MovieResponse } from './types/MovieResponse';
-import { Movie } from '../entities';
-import { MovieInput } from './types/MovieInput';
+import { movieService } from '../services';
+import { MovieResponse, MovieInputCreate, MovieInputUpdate } from './graphql-types';
 
 const moviesNotFound: MovieResponse = {
     errors: [
@@ -17,7 +15,25 @@ const createMoviesError: MovieResponse = {
     errors: [
         {
             path: 'create movie',
-            message: 'ERROR',
+            message: 'ERROR-CREATE',
+        },
+    ],
+};
+
+const updateMoviesError: MovieResponse = {
+    errors: [
+        {
+            path: 'create movie',
+            message: 'ERROR-UPDATE',
+        },
+    ],
+};
+
+const deleteMoviesError: MovieResponse = {
+    errors: [
+        {
+            path: 'create movie',
+            message: 'ERROR-DELETE',
         },
     ],
 };
@@ -44,10 +60,30 @@ export class MovieResolver {
     }
 
     @Mutation(_ => MovieResponse)
-    async createMovie(@Arg('data') data: MovieInput): Promise<MovieResponse> {
-        const movie = await movieService.create(<Movie>data);
+    async createMovie(@Arg('data') data: MovieInputCreate): Promise<MovieResponse> {
+        const movie = await movieService.create(data);
         if (!movie) {
             return createMoviesError;
+        }
+
+        return { movies: [movie] };
+    }
+
+    @Mutation(_ => MovieResponse)
+    async updateMovie(@Arg('data') data: MovieInputUpdate): Promise<MovieResponse> {
+        const movie = await movieService.update(data);
+        if (!movie) {
+            return updateMoviesError;
+        }
+
+        return { movies: [movie] };
+    }
+
+    @Mutation(_ => MovieResponse)
+    async deleteMovie(@Arg('id', _ => ID) id: number): Promise<MovieResponse> {
+        const movie = await movieService.delete(id);
+        if (!movie) {
+            return deleteMoviesError;
         }
 
         return { movies: [movie] };
