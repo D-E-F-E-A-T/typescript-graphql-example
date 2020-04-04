@@ -1,4 +1,4 @@
-import { movieService } from '../src/services';
+import { movieService } from '../src/services/movieService';
 
 import { Movie } from '../src/entities';
 

@@ -32,7 +32,7 @@
     "scripts": {
         "start": "nodemon --exec ts-node --files src/index.ts",
         "build": "tsc",
-        "test": "jest",
+        "test": "rimraf build && tsc && jest -c jest.config.js",
         "test:coverage": "jest --coverage"
     }
 }

@@ -1,4 +1,4 @@
-import { getConnection, createQueryBuilder } from 'typeorm';
+import { getConnection, createQueryBuilder, getRepository } from 'typeorm';
 import { Movie } from '../entities';
 
 class MovieService {
@@ -7,6 +7,14 @@ class MovieService {
             .getRepository(Movie)
             .createQueryBuilder('movie')
             .getMany();
+    }
+
+    public async create(data: Movie): Promise<Movie | undefined> {
+        const newMovie = new Movie();
+        Object.assign(newMovie, data);
+        const movie = await getRepository(Movie).save(newMovie);
+
+        return await this._findMovieById(movie.id);
     }
 
     public getById(id: number): Promise<Movie | undefined> {

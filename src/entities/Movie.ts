@@ -4,7 +4,7 @@ import { Field, Int, ObjectType, ID } from 'type-graphql';
 @ObjectType()
 @Entity()
 export class Movie extends BaseEntity {
-    @Field(() => ID, { nullable: true })
+    @Field(() => ID)
     @PrimaryGeneratedColumn()
     id: number;
 
