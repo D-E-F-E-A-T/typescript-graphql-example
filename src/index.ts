@@ -3,12 +3,14 @@ import { createConnection, getConnectionOptions } from 'typeorm';
 import express from 'express';
 import session from 'express-session';
 import redis from 'redis';
-import conncectRedis from 'connect-redis';
+import connectRedis from 'connect-redis';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { MovieResolver } from './resolvers';
+import { Container } from 'typedi';
+import { MovieService } from './services';
 
-const RedisStore = conncectRedis(session);
+const RedisStore = connectRedis(session);
 const RedisClient = redis.createClient();
 
 (async () => {
@@ -33,12 +35,14 @@ const RedisClient = redis.createClient();
     const dbOptions = await getConnectionOptions(process.env.NODE_ENV || 'development');
     await createConnection({ ...dbOptions, name: 'default' });
 
+    Container.set({ id: 'MOVIE_SERVICE', factory: () => MovieService });
+
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
             resolvers: [MovieResolver],
             validate: false,
+            container: Container,
         }),
-        context: ({ req, res }) => ({ req, res }),
     });
 
     apolloServer.applyMiddleware({ app, cors: false });

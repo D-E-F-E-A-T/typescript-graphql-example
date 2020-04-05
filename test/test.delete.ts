@@ -1,9 +1,16 @@
-import { movieService } from '../src/services';
+import { MovieService } from '../src/services';
 import { movie } from './utils';
 
 import typeorm = require('typeorm');
+import { EntityService } from '../src/types';
 
 describe('movieService => delete', () => {
+    let movieService: EntityService;
+
+    beforeAll(() => {
+        movieService = new MovieService();
+    });
+
     it('update movie', async () => {
         // @ts-ignore
         movieService._findMovieById = jest.fn().mockResolvedValue(movie);

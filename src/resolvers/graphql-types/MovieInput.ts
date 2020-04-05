@@ -1,8 +1,8 @@
 import { InputType, Field, Int, ID } from 'type-graphql';
-import { MovieDataToCreate, IMovieDataToUpdate } from '../../types';
+import { MovieDataToCreate, MovieDataToUpdate } from '../../types';
 
 @InputType()
-export class MovieInputUpdate implements IMovieDataToUpdate {
+export class MovieInputUpdate implements MovieDataToUpdate {
     @Field(_ => ID)
     id: number;
 

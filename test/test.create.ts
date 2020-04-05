@@ -1,10 +1,17 @@
-import { movieService } from '../src/services/movieService';
+import { MovieService } from '../src/services/movieService';
 import { movie } from './utils';
 
 import typeorm = require('typeorm');
 import { Movie } from '../src/entities';
+import { EntityService } from '../src/types';
 
 describe('movieService => create', () => {
+    let movieService: EntityService;
+
+    beforeAll(() => {
+        movieService = new MovieService();
+    });
+
     it('create movie', async () => {
         // @ts-ignore
         movieService._findMovieById = jest.fn().mockResolvedValue('0x0');

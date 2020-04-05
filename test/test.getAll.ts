@@ -1,10 +1,16 @@
-import { movieService } from '../src/services/movieService';
-
 import { Movie } from '../src/entities';
 
 import typeorm = require('typeorm');
+import { EntityService } from '../src/types';
+import { MovieService } from '../src/services';
 
 describe('movieService => getAll', () => {
+    let movieService: EntityService;
+
+    beforeAll(() => {
+        movieService = new MovieService();
+    });
+
     it('getAll method passed', async () => {
         const fakeQueryBuilder = jest.fn().mockReturnValue({
             leftJoinAndSelect: jest.fn().mockReturnThis(),

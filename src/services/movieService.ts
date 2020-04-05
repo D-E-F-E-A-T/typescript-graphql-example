@@ -1,13 +1,12 @@
 import { getConnection, createQueryBuilder, getRepository } from 'typeorm';
 import { Movie } from '../entities';
-import { MovieDataToCreate, IMovieDataToUpdate } from '../types';
+import { MovieDataToCreate, MovieDataToUpdate, EntityService } from '../types';
+import { Service } from 'typedi';
 
-class MovieService {
+@Service('movieservice')
+export class MovieService implements EntityService {
     public getAll(): Promise<Movie[]> {
-        return getConnection()
-            .getRepository(Movie)
-            .createQueryBuilder('movie')
-            .getMany();
+        return getConnection().getRepository(Movie).createQueryBuilder('movie').getMany();
     }
 
     public async create(data: MovieDataToCreate): Promise<Movie | undefined> {
@@ -18,7 +17,7 @@ class MovieService {
         return await this._findMovieById(movie.id);
     }
 
-    public async update({ id, ...data }: IMovieDataToUpdate): Promise<Movie | undefined> {
+    public async update({ id, ...data }: MovieDataToUpdate): Promise<Movie | undefined> {
         const movie = await this._findMovieById(id);
         if (!movie) {
             return undefined;
@@ -53,5 +52,3 @@ class MovieService {
             .getOne();
     }
 }
-
-export const movieService = new MovieService();

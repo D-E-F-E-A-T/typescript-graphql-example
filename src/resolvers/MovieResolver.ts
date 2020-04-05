@@ -1,6 +1,7 @@
 import { Resolver, Query, Arg, ID, Mutation } from 'type-graphql';
-import { movieService } from '../services';
 import { MovieResponse, MovieInputCreate, MovieInputUpdate } from './graphql-types';
+import { Service, Inject } from 'typedi';
+import { EntityService } from '../types';
 
 const moviesNotFound: MovieResponse = {
     errors: [
@@ -38,19 +39,23 @@ const deleteMoviesError: MovieResponse = {
     ],
 };
 
+@Service()
 @Resolver()
 export class MovieResolver {
-    @Query(_ => MovieResponse)
-    async movies(@Arg('id', _ => ID, { nullable: true }) id?: number): Promise<MovieResponse> {
+    @Inject('movieservice')
+    movieService: EntityService;
+
+    @Query((_) => MovieResponse)
+    async movies(@Arg('id', (_) => ID, { nullable: true }) id?: number): Promise<MovieResponse> {
         if (!id) {
-            const movies = await movieService.getAll();
+            const movies = await this.movieService.getAll();
             if (movies.length === 0) {
                 return moviesNotFound;
             }
             return { movies };
         }
 
-        const movie = await movieService.getById(id!);
+        const movie = await this.movieService.getById(id!);
 
         if (!movie) {
             return moviesNotFound;
@@ -59,9 +64,9 @@ export class MovieResolver {
         return { movies: [movie] };
     }
 
-    @Mutation(_ => MovieResponse)
+    @Mutation((_) => MovieResponse)
     async createMovie(@Arg('data') data: MovieInputCreate): Promise<MovieResponse> {
-        const movie = await movieService.create(data);
+        const movie = await this.movieService.create(data);
         if (!movie) {
             return createMoviesError;
         }
@@ -69,9 +74,9 @@ export class MovieResolver {
         return { movies: [movie] };
     }
 
-    @Mutation(_ => MovieResponse)
+    @Mutation((_) => MovieResponse)
     async updateMovie(@Arg('data') data: MovieInputUpdate): Promise<MovieResponse> {
-        const movie = await movieService.update(data);
+        const movie = await this.movieService.update(data);
         if (!movie) {
             return updateMoviesError;
         }
@@ -79,9 +84,9 @@ export class MovieResolver {
         return { movies: [movie] };
     }
 
-    @Mutation(_ => MovieResponse)
-    async deleteMovie(@Arg('id', _ => ID) id: number): Promise<MovieResponse> {
-        const movie = await movieService.delete(id);
+    @Mutation((_) => MovieResponse)
+    async deleteMovie(@Arg('id', (_) => ID) id: number): Promise<MovieResponse> {
+        const movie = await this.movieService.delete(id);
         if (!movie) {
             return deleteMoviesError;
         }
